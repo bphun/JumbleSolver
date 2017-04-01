@@ -57,20 +57,12 @@ public class ScrambleWords {
 			reader = new BufferedReader(new InputStreamReader(new FileInputStream(fileName), encoding));
 			writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(OUTPUTFILE_NAME), encoding));
 			for (String x = reader.readLine(); x != null; x = reader.readLine()) {
-				// if (++count == maxlines) {
-				// 	// writer.close();
-				// 	// writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(OUTPUTFILE_NAME), encoding));
-					
-				// 	// reader.close();
-				// 	// reader = new BufferedReader(new InputStreamReader(new FileInputStream(fileName), encoding));
-				// 	maxlines = 0;
-				// }
 				writer.write("word: " + x + "\n");
 				scrambledWords = scrambleWord(x);
 				for (String word : scrambledWords) {
 					writer.write(word + "\n");
+					writer.flush();
 				}
-				writer.flush();
 			}
 			reader.close();
 			writer.close();
@@ -81,64 +73,27 @@ public class ScrambleWords {
 	}
 
 	private Set<String> scrambleWord(String word) {
+		Set<String> scrambledWords = new HashSet<>();
+		if (word.length() == 0) {
+			scrambledWords.add("");
+			return scrambledWords;
+		}
 
-		List<String> scrambledWords = new LinkedList<>();
-		scrambledWords.add(String.valueOf(word.charAt(0)));
-
-		List<String> temp = new LinkedList<>();
-
-		for (int w = 1; w < word.length(); w++) {
-			for (int s = 0; s < scrambledWords.size(); s++) {
-				temp.addAll(merge(word.charAt(w), scrambledWords.get(s)));
+		char firstChar = word.charAt(0);
+		String remaining = word.substring(1); 
+		Set<String> words = scrambleWord(remaining);
+		for (String str : words) {
+			for (int i = 0; i <= str.length(); i++){
+				scrambledWords.add(insertChar(str, firstChar, i));
 			}
-
-			scrambledWords.clear();
-			scrambledWords.addAll(temp);
-
-			temp.clear();
 		}
-		return new HashSet<String>(scrambledWords);
+		return scrambledWords;
 	}
 
-	private static Set<String> merge(Character character,  String word) {
-		if (word == null || word.isEmpty()) {
-			return null;
-		}
-
-		int length = word.length();
-		StringBuilder stringBuilder = new StringBuilder();
-		Set<String> set = new HashSet<String>();
-
-		for (int i = 0; i <= length; i++) {
-			stringBuilder = new StringBuilder();
-			stringBuilder.append(word.substring(0, i) + character + word.substring(i, length));
-			set.add(stringBuilder.toString());
-		}
-		return set;
+	private String insertChar(String str, char c, int j) {
+		String begin = str.substring(0, j);
+		String end = str.substring(j);
+		return begin + c + end;
 	}
-
-	// private Set<String> scrambleWord(String word) {
-	// 	Set<String> scrambledWords = new HashSet<>();
-	// 	if (word.length() == 0) {
-	// 		scrambledWords.add("");
-	// 		return scrambledWords;
-	// 	}
-
-	// 	char firstChar = word.charAt(0);
-	// 	String remaining = word.substring(1); 
-	// 	Set<String> words = scrambleWord(remaining);
-	// 	for (String str : words) {
-	// 		for (int i = 0; i <= str.length(); i++){
-	// 			scrambledWords.add(insertChar(str, firstChar, i));
-	// 		}
-	// 	}
-	// 	return scrambledWords;
-	// }
-
-	// private String insertChar(String str, char c, int j) {
-	// 	String begin = str.substring(0, j);
-	// 	String end = str.substring(j);
-	// 	return begin + c + end;
-	// }
 
 }

@@ -36,6 +36,10 @@ public class JumbleSolver {
 		// readInFile();
 	}
 
+	public void calculatePossibilities(String str) {
+		
+	}
+
 	// private void readInFile() {
 	// 	try {
 	// 		BufferedReader reader = new BufferedReader(new FileReader(new File(WORD_LIST_DIRECTORY)));	
