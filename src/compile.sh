@@ -12,6 +12,6 @@ echo "Finished running"
 
 for file in *.class
 do
-        echo "Removing $file"
-        rm $file
+#        echo "Removing $file"
+#        rm $file
 done
