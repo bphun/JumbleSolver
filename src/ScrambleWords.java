@@ -1,8 +1,6 @@
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
-import java.io.File;
-import java.io.FileReader;
 import java.util.Set;
 import java.util.HashSet;
 import java.io.FileWriter;
@@ -10,16 +8,10 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.util.List;
-import java.util.LinkedList;
-import java.util.Iterator;
 
 public class ScrambleWords {
 		
-	private String fileName;	
-	private Set<String> words;
-	private File file;
-	private int MAX_NUM_LINES = 1000;
+	private String fileName;
 	private String OUTPUTFILE_NAME = "scrambledWords.txt";
 
 	public static void main(String[] args) {
@@ -31,23 +23,17 @@ public class ScrambleWords {
 	}
 
 	private void process(String fileName) {
-		words = new HashSet<>();
 		this.fileName = fileName;
-		file = new File(fileName);
 		processWordList();
 	}
 
 	public Set<String> process_return(String fileName) {
-		words = new HashSet<>();
 		this.fileName = fileName;
-		file = new File(fileName);
 		processWordList();
-		return words;
+		//return words;
 	}
 
 	private void processWordList() {
-		int maxlines = 100;
-		int count = 0;
 		String encoding = "UTF-8";
 		Set<String> scrambledWords = new HashSet<>();
 		BufferedReader reader;
@@ -63,6 +49,7 @@ public class ScrambleWords {
 					writer.write(word + "\n");
 					writer.flush();
 				}
+				scrambledWords.clear();
 			}
 			reader.close();
 			writer.close();
@@ -74,26 +61,27 @@ public class ScrambleWords {
 
 	private Set<String> scrambleWord(String word) {
 		Set<String> scrambledWords = new HashSet<>();
-		if (word.length() == 0) {
-			scrambledWords.add("");
-			return scrambledWords;
+		//if (word.length() == 0) {
+		//	scrambledWords.add("");
+		//	return scrambledWords;
+		//}
+                switch (word.length()) {
+			case 0:
+				scrambledWords.add("");
+				return scrambledWords;
 		}
-
-		char firstChar = word.charAt(0);
-		String remaining = word.substring(1); 
-		Set<String> words = scrambleWord(remaining);
+		
+		Set<String> words = scrambleWord(word.substring(1));
 		for (String str : words) {
 			for (int i = 0; i <= str.length(); i++){
-				scrambledWords.add(insertChar(str, firstChar, i));
+				scrambledWords.add(insertChar(str, word.charAt(0), i));
 			}
 		}
 		return scrambledWords;
 	}
 
 	private String insertChar(String str, char c, int j) {
-		String begin = str.substring(0, j);
-		String end = str.substring(j);
-		return begin + c + end;
+		return str.substring(0, j) + c + str.substring(j);
 	}
 
 }
