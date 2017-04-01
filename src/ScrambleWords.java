@@ -12,7 +12,8 @@ import java.io.FileOutputStream;
 public class ScrambleWords {
 		
 	private String fileName;
-	private String OUTPUTFILE_NAME = "scrambledWords.txt";
+	
+	private static final String OUTPUTFILE_NAME = "scrambledWords.txt";
 
 	public static void main(String[] args) {
 		if (args.length > 0) {
