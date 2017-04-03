@@ -13,6 +13,11 @@ import java.util.List;
 import java.util.ArrayList;
 import java.lang.StringBuilder;
 import java.util.Collections;
+import java.nio.file.Paths;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import org.apache.commons.io.FileUtils;
+import java.io.File;
 
 public class ScrambleWords {
 		
@@ -41,113 +46,39 @@ public class ScrambleWords {
 
 	private void processWordList() {
 		String encoding = "UTF-8";
-		Set<String> scrambledWords = new HashSet<>();
-		BufferedReader reader;
+		// Set<String> scrambledWords = new HashSet<>();
 		BufferedWriter writer;
-
+	
 		try {
-			reader = new BufferedReader(new InputStreamReader(new FileInputStream(fileName), encoding));
-			writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(OUTPUTFILE_NAME), encoding));
-			for (String x = reader.readLine(); x != null; x = reader.readLine()) {
-				writer.write("word: " + x + "\n");
-				scrambledWords = scrambleWord(x);
-				for (String word : scrambledWords) {
-					writer.write(word + "\n");
-					writer.flush();
-				}
-				scrambledWords.clear();
+			List<String> lines = Files.readAllLines(Paths.get(fileName), Charset.defaultCharset());
+			List<String> words = new ArrayList<>();
+			float size = lines.size();
+			for (int i = 0; i < lines.size(); i++) {
+				String word = lines.get(i);
+				if (word.length() > 10) {
+					continue; 
+				} /*else if (word.equals("Abbasside")) {
+					return;
+				}*/
+				
+				System.out.println("Current Word: " + word + ", Progress: " + ((i / size) * 100) + "%");
+
+				words.add("word: " + word);
+				words.addAll(scrambleWord(word));
+
+				// scrambledWords = scrambleWord(word);
+				// for (String str : scrambledWords) {
+				// 	words.add(str);
+				// }
+				// scrambledWords.clear();
 			}
-			reader.close();
-			writer.close();
+			File f = new File("scrambledWords.txt");
+			FileUtils.writeLines(f, words);
 		} catch (IOException e) {
 			System.err.println("Could not open text file");
 			e.printStackTrace();
 		}
 	}
-
-	// private Set<String> scrambleWord(String word) {
-	// 	Set<String> scrambled = new HashSet<>();
-	// 	List<String> strList;
-
-	// 	while (scrambled.size() < numCombinations(word)) {
-	// 		strList = new ArrayList<>();
-
-	// 		for (String s : word.toLowerCase().split("")) {
-	// 			strList.add(s);
-	// 		}
-
-	// 		Collections.shuffle(strList);
-
-	// 		StringBuilder stringBuilder = new StringBuilder();
-	// 		for (String s : strList) {
-	// 			stringBuilder.append(s);
-	// 		}
-
-	// 		String str = stringBuilder.toString();
-	// 		if (!scrambled.contains(str)) {
-	// 			scrambled.add(str);
-	// 		}
-	// 	}
-	// 	return scrambled;
-	// }
-
-	// public int numCombinations(String word){
-	// 	HashMap<String, Integer> tempStorage = new HashMap<String, Integer>();
-
-	// 	String[] temp = word.split("");
-
-	// 	int index = 1;
-	// 	for (String s : temp){
-	// 		if( !tempStorage.containsKey(s)){
-	// 			tempStorage.put(s, index);
-	// 		} else {
-	// 			tempStorage.put(s, tempStorage.get(s) + 1);
-	// 		}
-	// 	}
-
-	// 	int divide = 1;
-	// 	for (int d : tempStorage.values()){
-	// 		divide *= factorial(d);
-	// 	}
-	// 	return (factorial(word.length()) / divide);
-	// }
-
-	// public int factorial(int n){
-	// 	int d = 1;
-	// 	while(n > 1){
-	// 		d *= n--;
-	// 	}
-	// 	return d;
-	// }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 	private Set<String> scrambleWord(String word) {
 		Set<String> scrambledWords = new HashSet<>();
