@@ -5,6 +5,7 @@ import javax.swing.JFrame;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.File;
+import java.util.Map;
 
 public class JumbleSolver {
 
@@ -36,9 +37,27 @@ public class JumbleSolver {
 		// readInFile();
 	}
 
-	public void calculatePossibilities(String str) {
-		
-	}
+	// public Map<Integer, String> calculatePossibilities(String str) {
+	// 	HashMap<Integer, String> possibilities = new HashMap<>();
+
+	// 	for (Set<String> value : words.values()) {
+	// 		if (value.contains(str)) {
+
+	// 		}
+	// 	}
+
+	// 	for (Map.Entry<String, Set<String>> map : moves.entrySet()) {
+	// 		if (map.getValue().contains(str)) {
+	// 			possibilities.add(possibilities.size(), map.getKey());
+	// 		}
+	// 	}
+
+	// 	if (possibilities.size == 0) {
+	// 		return null;
+	// 	} else {
+	// 		return possibilities;
+	// 	}
+	// }
 
 	// private void readInFile() {
 	// 	try {

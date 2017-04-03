@@ -10,11 +10,15 @@ import javax.swing.KeyStroke;
 import javax.swing.AbstractAction;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Map;
+import java.util.HashMap;
+import java.awt.event.KeyEvent;
 
 public class JumbleSolverPanel extends JPanel {
 
 	private JumbleSolver jumbleSolver;
 	private List<Character> typedChars;
+	private Map<Integer, String> possibleWords;
 	private int numTextSquaresAdded;
 	private int squareX = 300;
 	private static final Dimension PANEL_DIMENSIONS = new Dimension(1300, 1000);
@@ -22,6 +26,7 @@ public class JumbleSolverPanel extends JPanel {
 
 	public JumbleSolverPanel(JumbleSolver jumbleSolver) {
 		this.typedChars = new ArrayList<>();
+		possibleWords = new HashMap<>();
 		this.numTextSquaresAdded = 0;
 		this.jumbleSolver = jumbleSolver;
 		this.setPreferredSize(PANEL_DIMENSIONS);
@@ -37,16 +42,30 @@ public class JumbleSolverPanel extends JPanel {
 			this.getInputMap().put(KeyStroke.getKeyStroke(c), c);
 		}
 
+		this.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SPACE, 0, false),"delete");
+
 		for (char c : alphabet) {
-			this.getActionMap().put(c,new AbstractAction(){
+			this.getActionMap().put(c, new AbstractAction(){
 				@Override
 				public void actionPerformed(ActionEvent e) {
+					if (typedChars.size() >= 10) { return; }
 					typedChars.add(c);
-					jumbleSolver.calculatePossibilities(new String(typedChars));
+					possibleWords = jumbleSolver.calculatePossibilities(new String(typedChars));
 					repaint();
 				}
 			});	
 		}
+
+		this.getActionMap().put("delete", new AbstractAction() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				if (typedChars.size() >= 0)  { return; }
+				typedChars.remove(typedChars.size() - 1);
+				possibleWords = jumbleSolver.calculatePossibilities(new String(typedChars));
+				repaint();
+			}
+
+		});
 	}
 
 	@Override
@@ -56,6 +75,7 @@ public class JumbleSolverPanel extends JPanel {
 		g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 		drawGUI(g2);
 		drawTextFields(g2);
+		drawPossibleWordsTextFields(g2);
 	}
 
 	private void drawGUI(Graphics2D g2) {
@@ -84,6 +104,12 @@ public class JumbleSolverPanel extends JPanel {
 			squareX += SQUARE_SIZE;
 		}
 		squareX = 300;
+	}
+
+	private void drawPossibleWordsTextFields(Graphics2D g2) {
+		if (possibleWords == null) { return; }
+
+		
 	}
 
 }
