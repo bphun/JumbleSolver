@@ -16,7 +16,6 @@ import java.util.Collections;
 import java.nio.file.Paths;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
-import org.apache.commons.io.FileUtils;
 import java.io.File;
 
 public class ScrambleWords {
@@ -29,7 +28,7 @@ public class ScrambleWords {
 		if (args.length > 0) {
 			new ScrambleWords().process(args[0]);
 		} else {
-			System.out.println("No file name found in args");
+			System.out.println("You did not specify the text file that you want to process");
 		}
 	}
 
@@ -48,36 +47,80 @@ public class ScrambleWords {
 		String encoding = "UTF-8";
 		// Set<String> scrambledWords = new HashSet<>();
 		BufferedWriter writer;
-	
+		int count = 0;
+		// try {
+		// 	List<String> lines = Files.readAllLines(Paths.get(fileName), Charset.defaultCharset());
+		// 	writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(OUTPUTFILE_NAME), encoding));
+		// 	float size = lines.size();
+		// 	for (int i = 0; i < lines.size(); i++) {
+		// 		String word = lines.get(i);
+		// 		if (word.length() > 7) {
+		// 			continue; 
+		// 		} /*else if (word.equals("Abbasside")) {
+		// 			return;
+		// 		}*/
+		
+		// 		System.out.println("Current Word: " + word + ", Progress: " + ((i / size) * 100) + "%");
+		
+		// 		writer.write("word: " + word + "\n");
+		
+		// 		scrambledWords = scrambleWord(word);
+		// 		for (String str : scrambledWords) {
+		// 			writer.write(str + "\n");
+		// 			writer.flush();
+		// 		}
+		
+		// 		scrambledWords.clear();
+		// 	}
+		// 	writer.close();
+		// } catch (IOException e) {
+		// 	System.err.println("Could not open text file");
+		// 	e.printStackTrace();
+		// }
+
 		try {
 			List<String> lines = Files.readAllLines(Paths.get(fileName), Charset.defaultCharset());
 			List<String> words = new ArrayList<>();
+			writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(OUTPUTFILE_NAME), encoding));
 			float size = lines.size();
 			for (int i = 0; i < lines.size(); i++) {
-				String word = lines.get(i);
-				if (word.length() > 10) {
+				String word = lines.get(i).toLowerCase();
+				if (word.length() > 9) {
 					continue; 
 				} /*else if (word.equals("Abbasside")) {
 					return;
-				}*/
+				}*/ 
+				if (count >= 1000000) {
+					System.out.println("Writing " + words.size() + " lines to " + OUTPUTFILE_NAME);
+					for (String s : words) {
+						writer.write(s);
+					}
+					count = 0;
+					words.clear();
+					System.out.println("Finished writing to " + OUTPUTFILE_NAME);
+				}
 				
 				System.out.println("Current Word: " + word + ", Progress: " + ((i / size) * 100) + "%");
 
 				words.add("word: " + word);
 				words.addAll(scrambleWord(word));
-
-				// scrambledWords = scrambleWord(word);
-				// for (String str : scrambledWords) {
-				// 	words.add(str);
-				// }
-				// scrambledWords.clear();
+				count = words.size();
 			}
-			File f = new File("scrambledWords.txt");
-			FileUtils.writeLines(f, words);
+			lines.clear();
+
+			if (words.size() > 0) {
+				for (String s : words) {
+					writer.write(s);
+				}
+				words.clear();
+			}
+
+			writer.close();
 		} catch (IOException e) {
 			System.err.println("Could not open text file");
 			e.printStackTrace();
 		}
+		
 	}
 
 	private Set<String> scrambleWord(String word) {

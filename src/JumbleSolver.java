@@ -1,11 +1,6 @@
 import java.util.HashMap;
 import java.util.Set;
-import java.util.HashSet;
 import javax.swing.JFrame;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.File;
-import java.util.Map;
 
 public class JumbleSolver {
 

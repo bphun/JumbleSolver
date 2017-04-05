@@ -17,10 +17,13 @@ import java.awt.event.KeyEvent;
 public class JumbleSolverPanel extends JPanel {
 
 	private JumbleSolver jumbleSolver;
+
 	private List<Character> typedChars;
 	private Map<Integer, String> possibleWords;
+	
 	private int numTextSquaresAdded;
 	private int squareX = 300;
+
 	private static final Dimension PANEL_DIMENSIONS = new Dimension(1300, 1000);
 	private static final int SQUARE_SIZE = 30;
 
@@ -50,7 +53,7 @@ public class JumbleSolverPanel extends JPanel {
 				public void actionPerformed(ActionEvent e) {
 					if (typedChars.size() >= 10) { return; }
 					typedChars.add(c);
-					possibleWords = jumbleSolver.calculatePossibilities(new String(typedChars));
+					// possibleWords = jumbleSolver.calculatePossibilities(new String(typedChars));
 					repaint();
 				}
 			});	
@@ -61,7 +64,7 @@ public class JumbleSolverPanel extends JPanel {
 			public void actionPerformed(ActionEvent e) {
 				if (typedChars.size() >= 0)  { return; }
 				typedChars.remove(typedChars.size() - 1);
-				possibleWords = jumbleSolver.calculatePossibilities(new String(typedChars));
+				// possibleWords = jumbleSolver.calculatePossibilities(new String(typedChars));
 				repaint();
 			}
 
