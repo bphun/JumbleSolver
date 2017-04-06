@@ -1,10 +1,18 @@
 import java.util.HashMap;
 import java.util.Set;
 import javax.swing.JFrame;
+import java.nio.file.Paths;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.io.File;
+import java.io.IOException;
+import java.util.Map;
+import java.util.List;
+import java.util.HashSet;
 
 public class JumbleSolver {
 
-	private static final String WORD_LIST_DIRECTORY = "words.txt";
+	private static final String SCRAMBLE_WORD_LIST_DIRECTORY = "scrambledWords.txt";
 
 	private JumbleSolverPanel panel;
 	private JFrame frame;
@@ -23,63 +31,46 @@ public class JumbleSolver {
 		frame.setVisible(true);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-		// if (!textFileIsFormated) {
-		// 	System.out.println("The text file that is selected has not yet been formatted... processing word file now.");
-		// 	ScrambleWords scrambler = new ScrambleWords();
-		// 	words = scrambler.process_return(words.txt);
-		// }
-
 		// readInFile();
 	}
 
-	// public Map<Integer, String> calculatePossibilities(String str) {
-	// 	HashMap<Integer, String> possibilities = new HashMap<>();
+	public Map<Integer, String> calculatePossibilities(String str) {
+		HashMap<Integer, String> possibilities = new HashMap<>();
 
-	// 	for (Set<String> value : words.values()) {
-	// 		if (value.contains(str)) {
+		for (Map.Entry<String, Set<String>> map : words.entrySet()) {
+			if (map.getValue().contains(str)) {
+				possibilities.put(possibilities.size(), map.getKey());
+			}
+		}
 
-	// 		}
-	// 	}
+		if (possibilities.size() == 0) {
+			return null;
+		} else {
+			return possibilities;
+		}
+	}
 
-	// 	for (Map.Entry<String, Set<String>> map : moves.entrySet()) {
-	// 		if (map.getValue().contains(str)) {
-	// 			possibilities.add(possibilities.size(), map.getKey());
-	// 		}
-	// 	}
-
-	// 	if (possibilities.size == 0) {
-	// 		return null;
-	// 	} else {
-	// 		return possibilities;
-	// 	}
-	// }
-
-	// private void readInFile() {
-	// 	try {
-	// 		BufferedReader reader = new BufferedReader(new FileReader(new File(WORD_LIST_DIRECTORY)));	
-	// 		for (String x = reader.readLine(); x != null; x = reader.readLine()) {
-	// 			words.add(x);
-	// 		}
-	// 		reader.close();
-	// 	} catch (IOException e) {
-	// 		System.err.println("Could not read text file");
-	// 		e.printStackTrace();
-	// 	}
-	// }
-
-	// private boolean textFileIsFormated() {
-	// 	try {
-	// 		BufferedReader reader = new BufferedReader(new FileReader(new File(WORD_LIST_DIRECTORY)));	
-	// 		if (!reader.readLine().contains("word: ")) {
-	// 			return false;
-	// 		}
-	// 	} catch (IOException e) {
-	// 		System.err.println("Could not read text file");
-	// 		e.printStackTrace();
-	// 	}
-
-	// 	return true;
-	// }
+	private void readInFile() {
+		String key = "";
+		try {
+			List<String> lines = Files.readAllLines(Paths.get(SCRAMBLE_WORD_LIST_DIRECTORY), Charset.defaultCharset());
+			Set<String> scrambled = new HashSet<>();
+			for (String s : lines) {
+				if (s.contains("word: ")) {
+					if (scrambled.size() > 0) {
+						words.put(key, scrambled);
+						scrambled.clear();
+					}
+					key = s;
+				} else {
+					scrambled.add(s);
+				}
+			}
+		} catch (IOException e) {
+			System.err.println("Could not read text file");
+			e.printStackTrace();
+		}
+	}
 
 
 }

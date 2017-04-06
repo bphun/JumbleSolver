@@ -91,16 +91,20 @@ public class ScrambleWords {
 					return;
 				}*/ 
 				if (count >= 1000000) {
-					System.out.println("Writing " + words.size() + " lines to " + OUTPUTFILE_NAME);
+					// System.out.println("Writing " + words.size() + " lines to " + OUTPUTFILE_NAME);
+					print("Writing " + words.size() + " lines to " + OUTPUTFILE_NAME);
 					for (String s : words) {
-						writer.write(s);
+						writer.write(s + "\n");
+						writer.flush();
 					}
 					count = 0;
 					words.clear();
-					System.out.println("Finished writing to " + OUTPUTFILE_NAME);
+					// System.out.println("Finished writing to " + OUTPUTFILE_NAME);
+					print("Finished writing to " + OUTPUTFILE_NAME);
 				}
 				
-				System.out.println("Current Word: " + word + ", Progress: " + ((i / size) * 100) + "%");
+				// System.out.println("Current Word: " + word + ", Progress: " + ((i / size) * 100) + "%");
+				print("Current Word: " + word + " , Progress: " + ((i / size) * 100) + "%");
 
 				words.add("word: " + word);
 				words.addAll(scrambleWord(word));
@@ -110,7 +114,8 @@ public class ScrambleWords {
 
 			if (words.size() > 0) {
 				for (String s : words) {
-					writer.write(s);
+					writer.write(s + "\n");
+					writer.flush();
 				}
 				words.clear();
 			}
@@ -119,8 +124,13 @@ public class ScrambleWords {
 		} catch (IOException e) {
 			System.err.println("Could not open text file");
 			e.printStackTrace();
-		}
-		
+		}		
+	}
+
+	private void print(String s) {
+		System.out.print(String.format("\033[%dA",1));
+		System.out.print("\033[2K");
+		System.out.println(s);
 	}
 
 	private Set<String> scrambleWord(String word) {

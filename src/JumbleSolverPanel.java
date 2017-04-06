@@ -18,7 +18,7 @@ public class JumbleSolverPanel extends JPanel {
 
 	private JumbleSolver jumbleSolver;
 
-	private List<Character> typedChars;
+	private char[] typedChars;
 	private Map<Integer, String> possibleWords;
 	
 	private int numTextSquaresAdded;
@@ -28,7 +28,7 @@ public class JumbleSolverPanel extends JPanel {
 	private static final int SQUARE_SIZE = 30;
 
 	public JumbleSolverPanel(JumbleSolver jumbleSolver) {
-		this.typedChars = new ArrayList<>();
+		this.typedChars = new char[0];
 		possibleWords = new HashMap<>();
 		this.numTextSquaresAdded = 0;
 		this.jumbleSolver = jumbleSolver;
@@ -51,8 +51,8 @@ public class JumbleSolverPanel extends JPanel {
 			this.getActionMap().put(c, new AbstractAction(){
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					if (typedChars.size() >= 10) { return; }
-					typedChars.add(c);
+					if (typedChars.length >= 10) { return; }
+					add(c);
 					// possibleWords = jumbleSolver.calculatePossibilities(new String(typedChars));
 					repaint();
 				}
@@ -62,13 +62,31 @@ public class JumbleSolverPanel extends JPanel {
 		this.getActionMap().put("delete", new AbstractAction() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				if (typedChars.size() >= 0)  { return; }
-				typedChars.remove(typedChars.size() - 1);
+				remove();
 				// possibleWords = jumbleSolver.calculatePossibilities(new String(typedChars));
 				repaint();
 			}
 
 		});
+	}
+
+	private void add(char c) {
+		char[] temp = new char[typedChars.length + 1];
+		for (int i = 0; i < typedChars.length; i++) {
+			temp[i] = typedChars[i];
+		}
+		temp[temp.length - 1] = c;
+
+		typedChars = temp;
+	}
+
+	private void remove() {
+		if (typedChars.length <= 0)  { return; }
+		char[] temp = new char[typedChars.length - 1];
+		for (int i = 0; i < typedChars.length - 1; i++) {
+			temp[i] = typedChars[i];
+		}
+		typedChars = temp;
 	}
 
 	@Override
