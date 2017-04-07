@@ -18,7 +18,7 @@ public class JumbleSolverPanel extends JPanel {
 
 	private JumbleSolver jumbleSolver;
 
-	private char[] typedChars;
+	private List<Character> typedChars;
 	private Map<Integer, String> possibleWords;
 	
 	private int numTextSquaresAdded;
@@ -28,7 +28,7 @@ public class JumbleSolverPanel extends JPanel {
 	private static final int SQUARE_SIZE = 30;
 
 	public JumbleSolverPanel(JumbleSolver jumbleSolver) {
-		this.typedChars = new char[0];
+		this.typedChars = new ArrayList<>();
 		possibleWords = new HashMap<>();
 		this.numTextSquaresAdded = 0;
 		this.jumbleSolver = jumbleSolver;
@@ -51,8 +51,8 @@ public class JumbleSolverPanel extends JPanel {
 			this.getActionMap().put(c, new AbstractAction(){
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					if (typedChars.length >= 10) { return; }
-					add(c);
+					if (typedChars.size() >= 10) { return; }
+					typedChars.add(c);
 					// possibleWords = jumbleSolver.calculatePossibilities(new String(typedChars));
 					repaint();
 				}
@@ -62,31 +62,13 @@ public class JumbleSolverPanel extends JPanel {
 		this.getActionMap().put("delete", new AbstractAction() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				remove();
+				if (typedChars.size() >= 0)  { return; }
+				typedChars.remove(typedChars.size() - 1);
 				// possibleWords = jumbleSolver.calculatePossibilities(new String(typedChars));
 				repaint();
 			}
 
 		});
-	}
-
-	private void add(char c) {
-		char[] temp = new char[typedChars.length + 1];
-		for (int i = 0; i < typedChars.length; i++) {
-			temp[i] = typedChars[i];
-		}
-		temp[temp.length - 1] = c;
-
-		typedChars = temp;
-	}
-
-	private void remove() {
-		if (typedChars.length <= 0)  { return; }
-		char[] temp = new char[typedChars.length - 1];
-		for (int i = 0; i < typedChars.length - 1; i++) {
-			temp[i] = typedChars[i];
-		}
-		typedChars = temp;
 	}
 
 	@Override
@@ -100,17 +82,26 @@ public class JumbleSolverPanel extends JPanel {
 	}
 
 	private void drawGUI(Graphics2D g2) {
-		Dimension ovalDimension = new Dimension(PANEL_DIMENSIONS.width - 50, PANEL_DIMENSIONS.height - 200);
+		Dimension ovalDimension1 = new Dimension(PANEL_DIMENSIONS.width *4/5, PANEL_DIMENSIONS.height *5/8);
 		// g2.drawOval(PANEL_DIMENSIONS.width / 2 - (ovalDimension.width / 2), PANEL_DIMENSIONS.height / 2 - (ovalDimension.height / 2), ovalDimension.width,  ovalDimension.height);
 		g2.setColor(new Color(187, 222, 251));
-		g2.fillOval(PANEL_DIMENSIONS.width / 2 - (ovalDimension.width / 2), PANEL_DIMENSIONS.height / 2 - (ovalDimension.height / 2), ovalDimension.width,  ovalDimension.height);
-		g2.setColor(Color.BLACK);
+		g2.fillOval(PANEL_DIMENSIONS.width / 2 - (int) (ovalDimension1.width / 2), PANEL_DIMENSIONS.height / 2 - (int) (ovalDimension1.height *2/3), ovalDimension1.width,  ovalDimension1.height);
 
+		Dimension ovalDimension2 = new Dimension( (int) PANEL_DIMENSIONS.width*2/5, (int) PANEL_DIMENSIONS.height*6/20);
+		g2.setColor(new Color(187,222,251));
+		g2.fillOval(PANEL_DIMENSIONS.width - (int) ovalDimension2.width - 50, 0, ovalDimension2.width, ovalDimension2.height);
+		
+		
+		g2.setColor(Color.BLACK);
 
 		g2.setFont(new Font("AvenirNext", Font.PLAIN, 30)); 
 		g2.drawString("Entered a scrambled word", (PANEL_DIMENSIONS.width / 2) - 290, 250);
 		g2.drawString("Possible words:", (PANEL_DIMENSIONS.width / 2) - 290, 450);
-
+		
+		g2.setFont(new Font("AvenirNext", Font.PLAIN, 36)); 
+		g2.drawString("JUMBLE", (PANEL_DIMENSIONS.width) - ovalDimension2.width+ 150, 100);
+		g2.drawString("SOLVER", (PANEL_DIMENSIONS.width) - ovalDimension2.width+ 150, 100+7 +30);
+		
 	}
 
 	private void drawTextFields(Graphics2D g2) {
@@ -134,3 +125,4 @@ public class JumbleSolverPanel extends JPanel {
 	}
 
 }
+
