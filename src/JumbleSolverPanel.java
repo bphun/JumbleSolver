@@ -13,13 +13,15 @@ import java.util.ArrayList;
 import java.util.Map;
 import java.util.HashMap;
 import java.awt.event.KeyEvent;
+import java.util.Set;
+import java.util.HashSet;
 
 public class JumbleSolverPanel extends JPanel {
 
 	private JumbleSolver jumbleSolver;
 
 	private char[] typedChars;
-	private Map<Integer, String> possibleWords;
+	private Set<String> possibleWords;
 	
 	private int numTextSquaresAdded;
 	private int squareX = 300;
@@ -29,7 +31,7 @@ public class JumbleSolverPanel extends JPanel {
 
 	public JumbleSolverPanel(JumbleSolver jumbleSolver) {
 		this.typedChars = new char[0];
-		possibleWords = new HashMap<>();
+		possibleWords = new HashSet<>();
 		this.numTextSquaresAdded = 0;
 		this.jumbleSolver = jumbleSolver;
 		this.setPreferredSize(PANEL_DIMENSIONS);
@@ -114,7 +116,7 @@ public class JumbleSolverPanel extends JPanel {
 	}
 
 	private void drawTextFields(Graphics2D g2) {
-		for (Character c : typedChars) {
+		for (char c : typedChars) {
 			// g2.drawRect(squareX, 300, SQUARE_SIZE, SQUARE_SIZE);
 			g2.setColor(Color.WHITE);
 			g2.fillRect(squareX, 300, SQUARE_SIZE, SQUARE_SIZE);
@@ -128,8 +130,25 @@ public class JumbleSolverPanel extends JPanel {
 	}
 
 	private void drawPossibleWordsTextFields(Graphics2D g2) {
-		if (possibleWords == null) { return; }
+		if (possibleWords.size() <= 0) { return; }
 
+		int x = 300;
+		int y = 800;
+
+		for (String s : possibleWords) {
+			char[] chars = s.toCharArray();
+
+			for (char c : chars) {
+				g2.setColor(Color.WHITE);
+				g2.fillRect(x, y, SQUARE_SIZE, SQUARE_SIZE);
+				g2.setColor(Color.BLACK);
+				g2.setFont(new Font("AvenirNext", Font.PLAIN, 20)); 
+				g2.drawString("" + c, x + (SQUARE_SIZE / 2), y + (SQUARE_SIZE / 2) + 10);
+
+				x += SQUARE_SIZE;
+			}
+			y += 80;
+		}
 		
 	}
 

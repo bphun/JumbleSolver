@@ -34,12 +34,12 @@ public class JumbleSolver {
 		// readInFile();
 	}
 
-	public Map<Integer, String> calculatePossibilities(String str) {
-		HashMap<Integer, String> possibilities = new HashMap<>();
+	public Set<String> calculatePossibilities(String str) {
+		Set<String> possibilities = new HashSet<>();
 
 		for (Map.Entry<String, Set<String>> map : words.entrySet()) {
 			if (map.getValue().contains(str)) {
-				possibilities.put(possibilities.size(), map.getKey());
+				possibilities.add(map.getKey());
 			}
 		}
 
