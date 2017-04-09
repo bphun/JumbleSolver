@@ -25,58 +25,63 @@ public class ScrambleWords {
 	private static final String OUTPUTFILE_NAME = "scrambledWords.txt";
 
 	public static void main(String[] args) {
-		if (args.length > 0) {
-			new ScrambleWords().process(args[0]);
+		if (args.length == 1) {
+			if (args[0].contains(".txt")) {
+				new ScrambleWords().processFile(args[0]);
+			} else {
+				new ScrambleWords().processWord(args[0]);
+			}  
+		} else if (args.length == 2) { 
+			if (args[0].toLowerCase().contains("unscramble")) {
+				new ScrambleWords().unscramble(args[1]);
+			}
 		} else {
 			System.out.println("You did not specify the text file that you want to process");
 		}
 	}
 
-	private void process(String fileName) {
+	private void processFile(String fileName) {
 		this.fileName = fileName;
 		processWordList();
 	}
 
-	// public Set<String> process_return(String fileName) {
-		// this.fileName = fileName;
-		// processWordList();
-		//return words;
-	// }
+	private void processWord(String word) {
+		for (String s : scrambleWord(word)) {
+			System.out.println("Scrambled: " + s);
+		}
+	}
+
+	private void unscramble(String word) {
+		System.out.println("Unscrambling " + word);
+		Set<String> possible = new HashSet<>();
+		try {
+			List<String> lines = Files.readAllLines(Paths.get("words.txt"), Charset.defaultCharset());
+			for (int i = 0; i < lines.size(); i++) {
+				String unscramble = lines.get(i);
+				for (String scramble : scrambleWord(word)) {
+					if (scramble.equals(unscramble)) {
+						possible.add(unscramble);
+						System.out.println(possible.size());
+					}
+				}
+				// print("Current line  = " + i);
+			} 
+		} catch (IOException e) {
+			System.err.println("Could not open text file");
+			e.printStackTrace();
+		}
+
+		for (String s : possible) {
+			System.out.println("Possible: " + s);
+		}
+	}
+
 
 	private void processWordList() {
 		String encoding = "UTF-8";
 		// Set<String> scrambledWords = new HashSet<>();
 		BufferedWriter writer;
 		int count = 0;
-		// try {
-		// 	List<String> lines = Files.readAllLines(Paths.get(fileName), Charset.defaultCharset());
-		// 	writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(OUTPUTFILE_NAME), encoding));
-		// 	float size = lines.size();
-		// 	for (int i = 0; i < lines.size(); i++) {
-		// 		String word = lines.get(i);
-		// 		if (word.length() > 7) {
-		// 			continue; 
-		// 		} /*else if (word.equals("Abbasside")) {
-		// 			return;
-		// 		}*/
-		
-		// 		System.out.println("Current Word: " + word + ", Progress: " + ((i / size) * 100) + "%");
-		
-		// 		writer.write("word: " + word + "\n");
-		
-		// 		scrambledWords = scrambleWord(word);
-		// 		for (String str : scrambledWords) {
-		// 			writer.write(str + "\n");
-		// 			writer.flush();
-		// 		}
-		
-		// 		scrambledWords.clear();
-		// 	}
-		// 	writer.close();
-		// } catch (IOException e) {
-		// 	System.err.println("Could not open text file");
-		// 	e.printStackTrace();
-		// }
 
 		try {
 			List<String> lines = Files.readAllLines(Paths.get(fileName), Charset.defaultCharset());
@@ -135,8 +140,7 @@ public class ScrambleWords {
 
 	private Set<String> scrambleWord(String word) {
 		Set<String> scrambledWords = new HashSet<>();
-		switch (word.length()) {
-			case 0:
+		if (word.length() == 0) {
 			scrambledWords.add("");
 			return scrambledWords;
 		}
