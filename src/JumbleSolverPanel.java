@@ -16,13 +16,14 @@ import java.awt.event.KeyEvent;
 import java.util.Set;
 import java.util.HashSet;
 
-public class JumbleSolverPanel extends JPanel {
+public class JumbleSolverPanel extends JPanel implements Runnable {
 
 	private JumbleSolver jumbleSolver;
 
+	private Thread thread;
+
 	private char[] typedChars;
 	private Set<String> possibleWords;
-	
 	private int numTextSquaresAdded;
 	private int squareX = 300;
 
@@ -37,6 +38,7 @@ public class JumbleSolverPanel extends JPanel {
 		this.setPreferredSize(PANEL_DIMENSIONS);
 		this.setBackground(new Color(255, 183, 77));
 		this.setUpKeyMappings();
+		thread = new Thread(this);
 	}
 
 	private void setUpKeyMappings() {
@@ -53,10 +55,17 @@ public class JumbleSolverPanel extends JPanel {
 			this.getActionMap().put(c, new AbstractAction(){
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					if (typedChars.length >= 10) { return; }
 					add(c);
-					// possibleWords = jumbleSolver.calculatePossibilities(new String(typedChars));
-					repaint();
+					if (typedChars.length >= 10) { 
+						return;
+					} else if (typedChars.length == 1) {
+						possibleWords.add(new String(typedChars));
+						repaint();
+						return;
+					}
+					thread.start();
+					repaint();	
+					join();
 				}
 			});	
 		}
@@ -65,11 +74,36 @@ public class JumbleSolverPanel extends JPanel {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				remove();
-				// possibleWords = jumbleSolver.calculatePossibilities(new String(typedChars));
-				repaint();
+				if (typedChars.length >= 10) { 
+					return;
+				} else if (typedChars.length <= 1) {
+					possibleWords.add(new String(typedChars));
+					repaint();
+					return;
+				}
+
+				thread.start();
+				repaint();	
+				join();
 			}
 
 		});
+	}
+
+	public synchronized void join() {
+		try {
+			thread.join();
+		} catch (Exception e) {
+
+		}
+	}
+
+	@Override
+	public void run() {
+		join();
+		Set<String> possibilities = jumbleSolver.findPossible(new String(typedChars));
+		if (possibilities == null) { return; }
+		this.possibleWords = possibilities;
 	}
 
 	private void add(char c) {
@@ -137,7 +171,7 @@ public class JumbleSolverPanel extends JPanel {
 
 		for (String s : possibleWords) {
 			char[] chars = s.toCharArray();
-
+			System.out.println("Word: " + new String(chars));
 			for (char c : chars) {
 				g2.setColor(Color.WHITE);
 				g2.fillRect(x, y, SQUARE_SIZE, SQUARE_SIZE);

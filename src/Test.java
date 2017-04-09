@@ -14,60 +14,58 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.util.ArrayList;
 
-public class JumbleSolver implements Runnable {
+public class Test implements Runnable {
 
-	private static final String SCRAMBLE_WORD_LIST_NAME = "scrambledWords.txt";
+	private List<String> lines;
+	private Set<String> possibilities;
+	private String currStr;
+	private Thread thread;
+	
 	private static final String WORD_LIST_NAME = "words.txt";
 
-	private JumbleSolverPanel panel;
-	private JFrame frame;
-	private String currStr;
-	private List<String> lines;
-	private Thread thread;
-	private Set<String> possible;
+	public static void main(String[] args) {	
+		new Test().start();
+	}
 
-	public static void main(String[] args) {
-		new JumbleSolver().start();
-	}	
-
-	private void start() {
+	public void start() {
 		lines = new ArrayList<>();
-		possible = new HashSet<>();
-		panel = new JumbleSolverPanel(this);
-		frame = new JFrame("Jumble Solver");
-		frame.add(panel);
-		frame.pack();
-		frame.setVisible(true);
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		readFile();
+		possibilities = new HashSet<>();
 		thread = new Thread(this);
+
+		readFile();
+
+		possibilities = findPossible("rapnte");
+		
+		for (String s : possibilities) {
+			System.out.println("Word: " + s);
+		}
 	}
 
 	public Set<String> findPossible(String str) {
 		currStr = str;
-		// thread.start();
+		thread.start();
 
-		for (int i = 0; i < lines.size(); i++) {
-			String unscramble = lines.get(i);
-			for (String scramble : scrambleWord(str)) {
-				if (scramble.equals(unscramble)) {
-					possible.add(unscramble);
-					System.out.println(possible.size());
+		for (int i = 0; i < lines.size() / 2; i++) {
+			for (String s : scrambleWord(lines.get(i))) {
+				if (s.equals(str)) {
+					possibilities.add(lines.get(i));
+					System.out.println(possibilities.size());
+					break;
 				}
 			}
 		}
 
-		return possible;
+		return possibilities;
 	}
 
 	@Override
 	public void run() {
 		for (int i = lines.size() - 1; i >= lines.size() / 2; i--) {
-			String unscramble = lines.get(i);
-			for (String scramble : scrambleWord(currStr)) {
-				if (scramble.equals(unscramble)) {
-					possible.add(unscramble);
-					System.out.println(possible.size());
+			for (String s : scrambleWord(lines.get(i))) {
+				if (s.equals(currStr)) {
+					possibilities.add(lines.get(i));
+					System.out.println(possibilities.size());
+					break;
 				}
 			}
 		}		
