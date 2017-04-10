@@ -25,9 +25,7 @@ public class ScrambleWords implements Runnable {
 	private Thread thread;
 	private String word;
 	private Set<String> possible;
-	private int currLine;
-	private List<String> right;
-	private List<String> left;
+
 	private static final String OUTPUTFILE_NAME = "scrambledWords.txt";
 
 	public static void main(String[] args) {
@@ -72,46 +70,33 @@ public class ScrambleWords implements Runnable {
 	// 		}
 	// 	} 
 	// 	for (String s : possible) {
-	// 		// System.out.println("Possible: " + s);
+	// 		System.out.println("Possible: " + s);
 	// 	}
 	// }
 
 	private void unscramble(String word) {
 		readFile();
 
-		this.word = word;
 		possible = new HashSet<>();
+		this.word = word;
+		thread = new Thread(this);
 
 		System.out.println("Unscrambling " + word);
-		
-		right = new ArrayList<>();
-		left = new ArrayList<>();
 
-		for (int i = 0; i < lines.size() / 2; i++) {
-			right.add(lines.get(i));
-		}
-		for (int i = lines.size() / 2; i < left.size(); i++) {
-			left.add(lines.get(i));
-		}
-
-		System.out.println("Left: " + left.size());
-		System.out.println("Right: " + right.size());
-
-		thread = new Thread(this);
 		thread.start();
+		List<String> right = new ArrayList<>();
+		for (int i = 0; i < lines.size() / 2; i++) {
+			right.add(get(i));
+		}
 
 		for (int i = 0; i < right.size(); i++) {
 			String unscramble = right.get(i);
 			for (String scramble : scrambleWord(word)) {
 				if (scramble.equals(unscramble)) {
 					add(unscramble);
-					// System.out.println(possible.size());
 				}
 			}
-			currLine = i;
-			// System.out.println("Main Thread currLine:" + currLine);
 		} 
-
 		join();
 
 		if (possible.size() == 0) {
@@ -127,24 +112,30 @@ public class ScrambleWords implements Runnable {
 
 	@Override
 	public void run() {
+		List<String> left = new ArrayList<>();
+		for (int i = lines.size() / 2; i < lines.size(); i++) {
+			left.add(get(i));
+		}
+
 		for (int i = 0; i < left.size(); i++) {
 			String unscramble = left.get(i);
 			for (String scramble : scrambleWord(this.word)) {
 				if (scramble.equals(unscramble)) {
 					add(unscramble);
-					// System.out.println(possible.size());
 				}
 			}
-			currLine = i;
-			// System.out.println("Thread 1 currLine:" + currLine);
 		} 
 	}
 
-	public synchronized void add(String s) {
+	private synchronized void add(String s) {
 		this.possible.add(s);
 	}
 
-	public synchronized void join() {
+	private synchronized String get(int i) {
+		return lines.get(i);
+	}
+
+	private void join() {
 		try {
 			thread.join();
 		} catch (Exception e) {
@@ -213,7 +204,6 @@ public class ScrambleWords implements Runnable {
 			System.err.println("Could not load words.txt");
 			e.printStackTrace(); 
 		}
-		System.out.println(lines.size());
 	}
 
 	private void print(String s) {
@@ -222,7 +212,7 @@ public class ScrambleWords implements Runnable {
 		System.out.println(s);
 	}
 
-	private synchronized Set<String> scrambleWord(String word) {
+	private Set<String> scrambleWord(String word) {
 		Set<String> scrambledWords = new HashSet<>();
 		if (word.length() == 0) {
 			scrambledWords.add("");
@@ -238,7 +228,7 @@ public class ScrambleWords implements Runnable {
 		return scrambledWords;
 	}
 
-	private synchronized String insertChar(String str, char c, int j) {
+	private String insertChar(String str, char c, int j) {
 		return str.substring(0, j) + c + str.substring(j);
 	}
 

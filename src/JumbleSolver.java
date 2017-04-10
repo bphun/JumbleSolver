@@ -45,32 +45,57 @@ public class JumbleSolver implements Runnable {
 
 	public Set<String> findPossible(String str) {
 		currStr = str;
-		// thread.start();
+		thread.start();
 
-		for (int i = 0; i < lines.size(); i++) {
-			String unscramble = lines.get(i);
+		List<String> right = new ArrayList<>();
+		for (int i = 0; i < lines.size() / 2; i++) {
+			right.add(get(i));
+		}
+
+		for (int i = 0; i < right.size(); i++) {
+			String unscramble = right.get(i);
 			for (String scramble : scrambleWord(str)) {
 				if (scramble.equals(unscramble)) {
-					possible.add(unscramble);
-					System.out.println(possible.size());
+					add(unscramble);
 				}
 			}
 		}
+
+		join();
 
 		return possible;
 	}
 
 	@Override
 	public void run() {
-		for (int i = lines.size() - 1; i >= lines.size() / 2; i--) {
-			String unscramble = lines.get(i);
+		List<String> left = new ArrayList<>();
+		for (int i = lines.size() / 2; i < lines.size(); i++) {
+			left.add(get(i));
+		}
+		for (int i = 0; i < left.size(); i++) {
+			String unscramble = left.get(i);
 			for (String scramble : scrambleWord(currStr)) {
 				if (scramble.equals(unscramble)) {
-					possible.add(unscramble);
-					System.out.println(possible.size());
+					add(unscramble);
 				}
 			}
 		}		
+	}
+
+	private void add(String s) {
+		this.possible.add(s);
+	}
+
+	private String get(int i) {
+		return lines.get(i);
+	}
+
+	private void join() {
+		try {
+			thread.join();
+		} catch (Exception e) {
+
+		}
 	}
 
 	private void readFile() {
@@ -103,5 +128,4 @@ public class JumbleSolver implements Runnable {
 	private String insertChar(String str, char c, int j) {
 		return str.substring(0, j) + c + str.substring(j);
 	}
-
 }
