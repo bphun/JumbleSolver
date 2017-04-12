@@ -1,4 +1,5 @@
 import javax.swing.JPanel;
+import javax.swing.JComponent;
 import java.awt.Dimension;
 import java.awt.Color;
 import java.awt.Graphics2D;
@@ -15,17 +16,19 @@ import java.util.HashMap;
 import java.awt.event.KeyEvent;
 import java.util.Set;
 import java.util.HashSet;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.Point;
 
-public class JumbleSolverPanel extends JPanel implements Runnable {
+public class JumbleSolverPanel extends JPanel {
 
 	private JumbleSolver jumbleSolver;
-
-	private Thread thread;
-
 	private char[] typedChars;
+	private Set<TextSquare> textSquares;
 	private Set<String> possibleWords;
 	private int numTextSquaresAdded;
-	private int squareX = 300;
+	private int squareX = 380;
+	private Thread thread;
 
 	private static final Dimension PANEL_DIMENSIONS = new Dimension(1300, 1000);
 	private static final int SQUARE_SIZE = 30;
@@ -33,12 +36,56 @@ public class JumbleSolverPanel extends JPanel implements Runnable {
 	public JumbleSolverPanel(JumbleSolver jumbleSolver) {
 		this.typedChars = new char[0];
 		this.possibleWords = new HashSet<>();
+		textSquares = new HashSet<>();
 		this.numTextSquaresAdded = 0;
 		this.jumbleSolver = jumbleSolver;
+		// this.thread = new Thread(this);
 		this.setPreferredSize(PANEL_DIMENSIONS);
 		this.setBackground(new Color(255, 183, 77));
 		this.setUpKeyMappings();
-		this.thread = new Thread(this);
+		this.setUpClickListener();
+	}
+
+	private void setUpClickListener() {
+		this.requestFocusInWindow();
+
+		this.addMouseListener(new MouseListener() {
+			
+			@Override
+			public void mouseClicked(MouseEvent arg0) {
+
+			}
+			@Override
+			public void mouseEntered(MouseEvent arg0) {
+
+			}
+			@Override
+			public void mouseExited(MouseEvent arg0) {
+
+			}
+			@Override
+			public void mousePressed(MouseEvent click) {
+				clickedAt(click);
+			}
+			@Override
+			public void mouseReleased(MouseEvent arg0) {
+
+			}
+		});
+	}
+
+	private void clickedAt(MouseEvent e) {
+		int x = e.getX();
+		int y = e.getY();
+
+		for (TextSquare textSquare : textSquares) {
+			if (textSquare.containsPoint(new Point(x, y))) {
+				// textSquare.setSelected();
+				// repaint();
+				System.out.println(textSquare.toString());
+			}
+		}
+		textSquares.clear();
 	}
 
 	private void setUpKeyMappings() {
@@ -46,20 +93,17 @@ public class JumbleSolverPanel extends JPanel implements Runnable {
 		char[] alphabet = "abcdefghijklmnopqrstuvwxyz".toCharArray();
 
 		for (char c : alphabet) {
-			this.getInputMap().put(KeyStroke.getKeyStroke(c), c);
+			this.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(c), c);
 		}
-		this.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SPACE, 0, false),"delete");
+		this.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SPACE, 0, false),"delete");
 
 		for (char c : alphabet) {
 			this.getActionMap().put(c, new AbstractAction(){
 				@Override
 				public void actionPerformed(ActionEvent e) {
 					add(c);
-
-					thread.start();
-
+					possibleWords = jumbleSolver.findPossible(new String(typedChars));
 					repaint();
-					join();
 				}
 			});	
 		}
@@ -68,29 +112,10 @@ public class JumbleSolverPanel extends JPanel implements Runnable {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				remove();
-
-				thread.start();
-
+				possibleWords = jumbleSolver.findPossible(new String(typedChars));
 				repaint();
-				join();
 			}
-
 		});
-	}
-
-	public synchronized void join() {
-		try {
-			thread.join();
-		} catch (Exception e) {
-			System.err.println("Could not join thread");
-		}
-	}
-
-	@Override
-	public void run() {
-		Set<String> possibilities = jumbleSolver.findPossible(new String(typedChars));
-		if (possibilities == null) { return; }
-		this.possibleWords = possibilities;
 	}
 
 	private void add(char c) {
@@ -132,44 +157,38 @@ public class JumbleSolverPanel extends JPanel implements Runnable {
 		g2.setFont(new Font("AvenirNext", Font.PLAIN, 30)); 
 		g2.drawString("Entered a scrambled word", (PANEL_DIMENSIONS.width / 2) - 290, 250);
 		g2.drawString("Possible words:", (PANEL_DIMENSIONS.width / 2) - 290, 450);
-
 	}
 
 	private void drawTextFields(Graphics2D g2) {
 		for (char c : typedChars) {
-			// g2.drawRect(squareX, 300, SQUARE_SIZE, SQUARE_SIZE);
-			g2.setColor(Color.WHITE);
-			g2.fillRect(squareX, 300, SQUARE_SIZE, SQUARE_SIZE);
-			g2.setColor(Color.BLACK);
-			g2.setFont(new Font("AvenirNext", Font.PLAIN, 20)); 
-			g2.drawString("" + c, squareX + (SQUARE_SIZE / 2), 300 + (SQUARE_SIZE / 2) + 10);
+			TextSquare textSquare = new TextSquare(c, squareX, 300);
+			textSquare.draw(g2);
+			textSquares.add(textSquare);
 			
 			squareX += SQUARE_SIZE;
 		}
-		squareX = 300;
+		squareX = 380;
 	}
 
 	private void drawPossibleWordsTextFields(Graphics2D g2) {
+		if (possibleWords == null) { possibleWords = new HashSet<>(); }
 		if (possibleWords.size() <= 0) { return; }
 
-		int x = 300;
-		int y = 800;
+		int x = 380;
+		int y = 500;
 
 		for (String s : possibleWords) {
 			char[] chars = s.toCharArray();
-			System.out.println("Word: " + new String(chars));
 			for (char c : chars) {
-				g2.setColor(Color.WHITE);
-				g2.fillRect(x, y, SQUARE_SIZE, SQUARE_SIZE);
-				g2.setColor(Color.BLACK);
-				g2.setFont(new Font("AvenirNext", Font.PLAIN, 20)); 
-				g2.drawString("" + c, x + (SQUARE_SIZE / 2), y + (SQUARE_SIZE / 2) + 10);
+				TextSquare textSquare = new TextSquare(c, x, y);
+				textSquare.draw(g2);
+				textSquares.add(textSquare);
 
 				x += SQUARE_SIZE;
 			}
-			y += 80;
+			x = 380;
+			y += 60;
 		}
-		
 	}
 
 }

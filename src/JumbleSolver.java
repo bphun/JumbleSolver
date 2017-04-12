@@ -13,8 +13,10 @@ import java.util.HashSet;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.util.ArrayList;
+import java.util.Map;
+import java.util.Arrays;
 
-public class JumbleSolver implements Runnable {
+public class JumbleSolver {
 
 	private static final String SCRAMBLE_WORD_LIST_NAME = "scrambledWords.txt";
 	private static final String WORD_LIST_NAME = "words.txt";
@@ -22,17 +24,13 @@ public class JumbleSolver implements Runnable {
 	private JumbleSolverPanel panel;
 	private JFrame frame;
 	private String currStr;
-	private List<String> lines;
-	private Thread thread;
-	private Set<String> possible;
+	private HashMap<String, Set<String>> words;
 
 	public static void main(String[] args) {
 		new JumbleSolver().start();
 	}	
 
 	private void start() {
-		lines = new ArrayList<>();
-		possible = new HashSet<>();
 		panel = new JumbleSolverPanel(this);
 		frame = new JFrame("Jumble Solver");
 		frame.add(panel);
@@ -40,71 +38,48 @@ public class JumbleSolver implements Runnable {
 		frame.setVisible(true);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		readFile();
-		thread = new Thread(this);
 	}
 
 	public Set<String> findPossible(String str) {
-		currStr = str;
-		thread.start();
-
-		List<String> right = new ArrayList<>();
-		for (int i = 0; i < lines.size() / 2; i++) {
-			right.add(get(i));
-		}
-
-		for (int i = 0; i < right.size(); i++) {
-			String unscramble = right.get(i);
-			for (String scramble : scrambleWord(str)) {
-				if (scramble.equals(unscramble)) {
-					add(unscramble);
+		for (Map.Entry<String, Set<String>> map : words.entrySet()) {
+			if (map.getKey().equals(alphebatize(str))) {
+				for (String s : map.getValue()) {
+					return map.getValue();
 				}
 			}
 		}
+		// return words.get(alphebatize(str));
 
-		join();
-
-		return possible;
-	}
-
-	@Override
-	public void run() {
-		List<String> left = new ArrayList<>();
-		for (int i = lines.size() / 2; i < lines.size(); i++) {
-			left.add(get(i));
-		}
-		for (int i = 0; i < left.size(); i++) {
-			String unscramble = left.get(i);
-			for (String scramble : scrambleWord(currStr)) {
-				if (scramble.equals(unscramble)) {
-					add(unscramble);
-				}
-			}
-		}		
-	}
-
-	private void add(String s) {
-		this.possible.add(s);
-	}
-
-	private String get(int i) {
-		return lines.get(i);
-	}
-
-	private void join() {
-		try {
-			thread.join();
-		} catch (Exception e) {
-
-		}
+		return null;
 	}
 
 	private void readFile() {
+		List<String> lines = new ArrayList<>();
 		try {
 			lines = Files.readAllLines(Paths.get(WORD_LIST_NAME), Charset.defaultCharset());
 		} catch (IOException e) {
 			System.err.println("Could not load " + WORD_LIST_NAME);
 			e.printStackTrace(); 
 		}
+		words = new HashMap<>();
+		for (String s : lines) {
+			String alphabetizedString = alphebatize(s);
+
+			if (words.containsKey(alphabetizedString)) {
+				words.get(alphabetizedString).add(s);
+			} else {
+				Set<String> set = new HashSet<>();
+				set.add(s);
+				words.put(alphabetizedString, set);
+			}
+		}
+	}
+
+	private String alphebatize(String s) {
+		if (s.length() == 1) { return s; }
+		char[] alphabetizedChars = s.toCharArray();
+		Arrays.sort(alphabetizedChars);
+		return new String(alphabetizedChars);
 	}
 
 	private Set<String> scrambleWord(String word) {

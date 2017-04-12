@@ -141193,6 +141193,7 @@ peed
 peek
 peekaboo
 peel
+Peels
 peelable
 peele
 peeled
@@ -146683,6 +146684,7 @@ pilastrade
 pilastraded
 pilastric
 Pilate
+Pilates
 Pilatian
 pilau
 pilaued
@@ -149194,6 +149196,7 @@ Pneumatria
 pneumaturia
 pneumectomy
 pneumobacillus
+Pneumonoultramicroscopicsilicovolcanoconiosis
 Pneumobranchia
 Pneumobranchiata
 pneumocele
@@ -186115,6 +186118,7 @@ speedway
 speedwell
 speedy
 speel
+speels
 speelken
 speelless
 speen

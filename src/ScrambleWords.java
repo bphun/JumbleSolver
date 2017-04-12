@@ -17,14 +17,16 @@ import java.nio.file.Paths;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.io.File;
+import java.util.Arrays;
+import java.util.Map;
 
-public class ScrambleWords implements Runnable {
+public class ScrambleWords {
 		
 	private String fileName;
 	private List<String> lines;
+	private HashMap<String, Set<String>> words;
 	private Thread thread;
 	private String word;
-	private Set<String> possible;
 
 	private static final String OUTPUTFILE_NAME = "scrambledWords.txt";
 
@@ -56,91 +58,26 @@ public class ScrambleWords implements Runnable {
 		}
 	}
 
-	// private void unscramble(String word) {
-	// 	possible = new HashSet<>();
-	// 	readFile();
-	// 	System.out.println("Unscrambling " + word);
-	// 	for (int i = 0; i < lines.size(); i++) {
-	// 		String unscramble = lines.get(i);
-	// 		for (String scramble : scrambleWord(word)) {
-	// 			if (scramble.equals(unscramble)) {
-	// 				possible.add(unscramble);
-	// 				// System.out.println(possible.size());
-	// 			}
-	// 		}
-	// 	} 
-	// 	for (String s : possible) {
-	// 		System.out.println("Possible: " + s);
-	// 	}
-	// }
-
 	private void unscramble(String word) {
 		readFile();
+		processLines();
 
-		possible = new HashSet<>();
-		this.word = word;
-		thread = new Thread(this);
-
-		System.out.println("Unscrambling " + word);
-
-		thread.start();
-		List<String> right = new ArrayList<>();
-		for (int i = 0; i < lines.size() / 2; i++) {
-			right.add(get(i));
-		}
-
-		for (int i = 0; i < right.size(); i++) {
-			String unscramble = right.get(i);
-			for (String scramble : scrambleWord(word)) {
-				if (scramble.equals(unscramble)) {
-					add(unscramble);
+		for (Map.Entry<String, Set<String>> map : words.entrySet()) {
+			if (map.getKey().equals(alphebatize(word))) {
+				for (String s : map.getValue()) {
+					if (s.equals(word)) { continue; }
+					System.out.println("Possible: " + s);
 				}
-			}
-		} 
-		join();
-
-		if (possible.size() == 0) {
-			System.out.println("No possible words");
-			return;
-		} else {
-			for (String s : possible) {
-				if (s.equals(word)) { continue; }
-				System.out.println("Possible: " + s);
+				return;
 			}
 		}
 	}
 
-	@Override
-	public void run() {
-		List<String> left = new ArrayList<>();
-		for (int i = lines.size() / 2; i < lines.size(); i++) {
-			left.add(get(i));
-		}
-
-		for (int i = 0; i < left.size(); i++) {
-			String unscramble = left.get(i);
-			for (String scramble : scrambleWord(this.word)) {
-				if (scramble.equals(unscramble)) {
-					add(unscramble);
-				}
-			}
-		} 
-	}
-
-	private synchronized void add(String s) {
-		this.possible.add(s);
-	}
-
-	private synchronized String get(int i) {
-		return lines.get(i);
-	}
-
-	private void join() {
-		try {
-			thread.join();
-		} catch (Exception e) {
-
-		}
+	private String alphebatize(String s) {
+		if (s.length() == 1) { return s; }
+		char[] alphabetizedChars = s.toCharArray();
+		Arrays.sort(alphabetizedChars);
+		return new String(alphabetizedChars);
 	}
 
 	private void processWordList() {
@@ -157,9 +94,8 @@ public class ScrambleWords implements Runnable {
 				String word = lines.get(i).toLowerCase();
 				if (word.length() > 9) {
 					continue; 
-				} /*else if (word.equals("Abbasside")) {
-					return;
-				}*/ 
+				} 
+				
 				if (count >= 1000000) {
 					// System.out.println("Writing " + words.size() + " lines to " + OUTPUTFILE_NAME);
 					print("Writing " + words.size() + " lines to " + OUTPUTFILE_NAME);
@@ -197,6 +133,21 @@ public class ScrambleWords implements Runnable {
 		}		
 	}
 
+	private void processLines() {
+		words = new HashMap<>();
+		for (String s : lines) {
+			String alphabetizedString = alphebatize(s);
+
+			if (words.containsKey(alphabetizedString)) {
+				words.get(alphabetizedString).add(s);
+			} else {
+				Set<String> set = new HashSet<>();
+				set.add(s);
+				words.put(alphabetizedString, set);
+			}
+		}
+	}
+
 	private void readFile() {
 		try {
 			lines = Files.readAllLines(Paths.get("words.txt"), Charset.defaultCharset());
@@ -231,6 +182,4 @@ public class ScrambleWords implements Runnable {
 	private String insertChar(String str, char c, int j) {
 		return str.substring(0, j) + c + str.substring(j);
 	}
-
-
 }
