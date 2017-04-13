@@ -63,7 +63,7 @@ public class ScrambleWords {
 		processLines();
 
 		for (Map.Entry<String, Set<String>> map : words.entrySet()) {
-			if (map.getKey().equals(alphebatize(word))) {
+			if (map.getKey().equals(alphabetize(word))) {
 				for (String s : map.getValue()) {
 					if (s.equals(word)) { continue; }
 					System.out.println("Possible: " + s);
@@ -73,11 +73,11 @@ public class ScrambleWords {
 		}
 	}
 
-	private String alphebatize(String s) {
+	private String alphabetize(String s) {
 		if (s.length() == 1) { return s; }
-		char[] alphabetizedChars = s.toCharArray();
-		Arrays.sort(alphabetizedChars);
-		return new String(alphabetizedChars);
+		char[] alphabatizedChars = s.toCharArray();
+		Arrays.sort(alphabatizedChars);
+		return new String(alphabatizedChars);
 	}
 
 	private void processWordList() {
@@ -95,7 +95,7 @@ public class ScrambleWords {
 				if (word.length() > 9) {
 					continue; 
 				} 
-				
+
 				if (count >= 1000000) {
 					// System.out.println("Writing " + words.size() + " lines to " + OUTPUTFILE_NAME);
 					print("Writing " + words.size() + " lines to " + OUTPUTFILE_NAME);
@@ -136,7 +136,7 @@ public class ScrambleWords {
 	private void processLines() {
 		words = new HashMap<>();
 		for (String s : lines) {
-			String alphabetizedString = alphebatize(s);
+			String alphabetizedString = alphabetize(s);
 
 			if (words.containsKey(alphabetizedString)) {
 				words.get(alphabetizedString).add(s);

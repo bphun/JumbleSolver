@@ -23,12 +23,14 @@ import java.awt.Point;
 public class JumbleSolverPanel extends JPanel {
 
 	private JumbleSolver jumbleSolver;
+
 	private char[] typedChars;
-	private Set<TextSquare> textSquares;
+	private List<TextSquare> textSquares;
 	private Set<String> possibleWords;
+	private List<Character> selectedChars;
+
 	private int numTextSquaresAdded;
 	private int squareX = 380;
-	private Thread thread;
 
 	private static final Dimension PANEL_DIMENSIONS = new Dimension(1300, 1000);
 	private static final int SQUARE_SIZE = 30;
@@ -36,12 +38,12 @@ public class JumbleSolverPanel extends JPanel {
 	public JumbleSolverPanel(JumbleSolver jumbleSolver) {
 		this.typedChars = new char[0];
 		this.possibleWords = new HashSet<>();
-		textSquares = new HashSet<>();
+		this.textSquares = new ArrayList<>();
+		this.selectedChars = new ArrayList<>();
+		this.setBackground(new Color(255, 183, 77));
+		this.setPreferredSize(PANEL_DIMENSIONS);
 		this.numTextSquaresAdded = 0;
 		this.jumbleSolver = jumbleSolver;
-		// this.thread = new Thread(this);
-		this.setPreferredSize(PANEL_DIMENSIONS);
-		this.setBackground(new Color(255, 183, 77));
 		this.setUpKeyMappings();
 		this.setUpClickListener();
 	}
@@ -77,15 +79,18 @@ public class JumbleSolverPanel extends JPanel {
 	private void clickedAt(MouseEvent e) {
 		int x = e.getX();
 		int y = e.getY();
-
 		for (TextSquare textSquare : textSquares) {
 			if (textSquare.containsPoint(new Point(x, y))) {
-				// textSquare.setSelected();
-				// repaint();
-				System.out.println(textSquare.toString());
+				textSquare.setSelected();
+				if (textSquare.selected()){
+					selectedChars.add(textSquare.character());
+				} else {
+					selectedChars.remove(textSquare.character());
+				}
+				repaint();
+				break;
 			}
 		}
-		textSquares.clear();
 	}
 
 	private void setUpKeyMappings() {

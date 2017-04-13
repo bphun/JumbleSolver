@@ -16,11 +16,10 @@ public class TextSquare {
 		this.c = c;
 		this.x = x;
 		this.y = y;
-		this.selected = false;
 	} 
 
-	public char character() {
-		return this.c;
+	public Character character() {
+		return (Character)this.c;
 	}
 
 	public int getX() {
@@ -36,7 +35,7 @@ public class TextSquare {
 	} 
 
 	public void setSelected() {
-		this.selected = !selected;
+		this.selected = !this.selected;
 	}
 
 	public boolean selected() {
@@ -45,7 +44,7 @@ public class TextSquare {
 
 	@Override
 	public String toString() {
-		return "Character: " + c + " X: " + x + " Y: " + y; 
+		return "Character: " + c + " X: " + x + " Y: " + y + " Selected: " + selected; 
 	}
 
 	public void draw(Graphics2D g2) {
@@ -54,9 +53,12 @@ public class TextSquare {
 		g2.setColor(Color.BLACK);
 		g2.setFont(new Font("AvenirNext", Font.PLAIN, 20)); 
 		g2.drawString("" + c, x + (SQUARE_SIZE / 2) - 10, y + (SQUARE_SIZE / 2) + 10);
+		System.out.println(selected);
 		if (selected) {
-			g2.setColor(Color.BLACK);
-			g2.drawOval(x, y, SQUARE_SIZE, SQUARE_SIZE);
+			g2.setColor(Color.GREEN);
+			g2.fillOval(x, y, SQUARE_SIZE, SQUARE_SIZE);
 		}
 	}
 }
+
+
