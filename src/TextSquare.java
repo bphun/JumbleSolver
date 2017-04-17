@@ -48,12 +48,11 @@ public class TextSquare {
 	}
 
 	public void draw(Graphics2D g2) {
-		g2.setColor(Color.WHITE);
+		g2.setColor(new Color(130, 134, 18));
 		g2.fillRect(x, y, SQUARE_SIZE, SQUARE_SIZE);
 		g2.setColor(Color.BLACK);
-		g2.setFont(new Font("AvenirNext", Font.PLAIN, 20)); 
+		g2.setFont(new Font("Comic Sans MS", Font.PLAIN, 20)); 
 		g2.drawString("" + c, x + (SQUARE_SIZE / 2) - 10, y + (SQUARE_SIZE / 2) + 10);
-		System.out.println(selected);
 		if (selected) {
 			g2.setColor(Color.GREEN);
 			g2.fillOval(x, y, SQUARE_SIZE, SQUARE_SIZE);

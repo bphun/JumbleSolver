@@ -11,8 +11,6 @@ import javax.swing.KeyStroke;
 import javax.swing.AbstractAction;
 import java.util.List;
 import java.util.ArrayList;
-import java.util.Map;
-import java.util.HashMap;
 import java.awt.event.KeyEvent;
 import java.util.Set;
 import java.util.HashSet;
@@ -29,7 +27,6 @@ public class JumbleSolverPanel extends JPanel {
 	private Set<String> possibleWords;
 	private List<Character> selectedChars;
 
-	private int numTextSquaresAdded;
 	private int squareX = 380;
 
 	private static final Dimension PANEL_DIMENSIONS = new Dimension(1300, 1000);
@@ -40,9 +37,8 @@ public class JumbleSolverPanel extends JPanel {
 		this.possibleWords = new HashSet<>();
 		this.textSquares = new ArrayList<>();
 		this.selectedChars = new ArrayList<>();
-		this.setBackground(new Color(255, 183, 77));
+		this.setBackground(new Color(71, 42, 63));
 		this.setPreferredSize(PANEL_DIMENSIONS);
-		this.numTextSquaresAdded = 0;
 		this.jumbleSolver = jumbleSolver;
 		this.setUpKeyMappings();
 		this.setUpClickListener();
@@ -52,7 +48,6 @@ public class JumbleSolverPanel extends JPanel {
 		this.requestFocusInWindow();
 
 		this.addMouseListener(new MouseListener() {
-			
 			@Override
 			public void mouseClicked(MouseEvent arg0) {
 
@@ -79,9 +74,11 @@ public class JumbleSolverPanel extends JPanel {
 	private void clickedAt(MouseEvent e) {
 		int x = e.getX();
 		int y = e.getY();
-		for (TextSquare textSquare : textSquares) {
+		for (int i = 0; i < textSquares.size(); i++) {
+			TextSquare textSquare = textSquares.get(i);
 			if (textSquare.containsPoint(new Point(x, y))) {
 				textSquare.setSelected();
+				System.out.println(textSquare.selected());
 				if (textSquare.selected()){
 					selectedChars.add(textSquare.character());
 				} else {
@@ -154,12 +151,12 @@ public class JumbleSolverPanel extends JPanel {
 
 	private void drawGUI(Graphics2D g2) {
 		Dimension ovalDimension = new Dimension(PANEL_DIMENSIONS.width - 50, PANEL_DIMENSIONS.height - 200);
-		g2.setColor(new Color(187, 222, 251));
+		g2.setColor(new Color(130, 134, 18));
 		g2.fillOval(PANEL_DIMENSIONS.width / 2 - (ovalDimension.width / 2), PANEL_DIMENSIONS.height / 2 - (ovalDimension.height / 2), ovalDimension.width,  ovalDimension.height);
 		g2.setColor(Color.BLACK);
 
 
-		g2.setFont(new Font("AvenirNext", Font.PLAIN, 30)); 
+		g2.setFont(new Font("Comic Sans MS", Font.PLAIN, 30)); 
 		g2.drawString("Entered a scrambled word", (PANEL_DIMENSIONS.width / 2) - 290, 250);
 		g2.drawString("Possible words:", (PANEL_DIMENSIONS.width / 2) - 290, 450);
 	}
@@ -195,5 +192,4 @@ public class JumbleSolverPanel extends JPanel {
 			y += 60;
 		}
 	}
-
 }

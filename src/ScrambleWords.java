@@ -1,32 +1,22 @@
-import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.Set;
 import java.util.HashSet;
 import java.util.HashMap;
-import java.io.FileWriter;
-import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.util.List;
 import java.util.ArrayList;
-import java.lang.StringBuilder;
-import java.util.Collections;
 import java.nio.file.Paths;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
-import java.io.File;
 import java.util.Arrays;
 import java.util.Map;
 
 public class ScrambleWords {
 		
-	private String fileName;
 	private List<String> lines;
 	private HashMap<String, Set<String>> words;
-	private Thread thread;
-	private String word;
 
 	private static final String OUTPUTFILE_NAME = "scrambledWords.txt";
 
@@ -48,7 +38,6 @@ public class ScrambleWords {
 
 	private void processFile(String fileName) {
 		readFile();
-		this.fileName = fileName;
 		processWordList();
 	}
 
@@ -82,7 +71,6 @@ public class ScrambleWords {
 
 	private void processWordList() {
 		String encoding = "UTF-8";
-		// Set<String> scrambledWords = new HashSet<>();
 		BufferedWriter writer;
 		int count = 0;
 		readFile();
